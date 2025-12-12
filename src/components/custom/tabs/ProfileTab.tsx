@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Scale, Ruler, Target, Bell, Crown, LogOut, RefreshCw, ChevronRight } from 'lucide-react';
+import { User, Scale, Ruler, Target, Bell, RefreshCw, ChevronRight, TrendingDown, Calendar, Award, Plus } from 'lucide-react';
 import { type QuizData } from '@/lib/workouts';
 
 interface ProfileTabProps {
@@ -10,7 +10,15 @@ interface ProfileTabProps {
 }
 
 export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
-  const [showPremium, setShowPremium] = useState(false);
+  const [weightHistory, setWeightHistory] = useState([
+    { date: 'Semana 1', weight: quizData.currentWeight },
+    { date: 'Semana 2', weight: quizData.currentWeight - 0.5 },
+    { date: 'Semana 3', weight: quizData.currentWeight - 1.2 },
+    { date: 'Semana 4', weight: quizData.currentWeight - 2.0 },
+  ]);
+
+  const [showAddWeight, setShowAddWeight] = useState(false);
+  const [newWeight, setNewWeight] = useState('');
 
   const calculateBMI = (weight: number, height: number) => {
     const heightInMeters = height / 100;
@@ -18,90 +26,21 @@ export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
   };
 
   const currentBMI = calculateBMI(quizData.currentWeight, quizData.height);
+  const weightLost = quizData.currentWeight - weightHistory[weightHistory.length - 1].weight;
+  const weightToGo = quizData.currentWeight - quizData.targetWeight;
+  const progressPercentage = ((weightLost / weightToGo) * 100).toFixed(0);
 
-  if (showPremium) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-purple-600 to-pink-600 text-white p-6 rounded-b-3xl">
-          <button
-            onClick={() => setShowPremium(false)}
-            className="mb-4 text-white/80 hover:text-white"
-          >
-            ← Voltar
-          </button>
-          <div className="text-center">
-            <Crown className="w-16 h-16 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold mb-2">Sua mudança começa hoje!</h1>
-            <p className="text-white/90">Desbloqueie todo o potencial do app</p>
-          </div>
-        </div>
-
-        {/* Benefits */}
-        <div className="p-6 space-y-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
-            <h3 className="font-bold text-lg mb-4">O que você ganha:</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="font-medium">Preparo físico em casa</p>
-                  <p className="text-sm text-muted-foreground">Mais de 100 treinos para abdômen, corpo inteiro e mais</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="font-medium">Cuidado facial</p>
-                  <p className="text-sm text-muted-foreground">Rotinas extras de bem-estar</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="font-medium">Alongamento para relaxar</p>
-                  <p className="text-sm text-muted-foreground">Para dormir melhor e recuperar</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="font-medium">Alimentações mais saudáveis</p>
-                  <p className="text-sm text-muted-foreground">Mais de 50 receitas extras</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* Pricing */}
-          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm opacity-90">Plano Anual</p>
-                <p className="text-3xl font-bold">R$ 9,90/mês</p>
-              </div>
-              <div className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
-                -67%
-              </div>
-            </div>
-            <p className="text-sm opacity-90 mb-4">
-              Cobrado R$ 118,80 anualmente
-            </p>
-            <button className="w-full py-4 bg-white text-purple-600 rounded-xl font-bold hover:scale-105 transition-transform">
-              Continuar
-            </button>
-            <p className="text-xs text-center mt-3 opacity-75">
-              7 dias grátis • Cancele quando quiser
-            </p>
-          </div>
-
-          <p className="text-xs text-center text-muted-foreground">
-            Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const handleAddWeight = () => {
+    if (newWeight && parseFloat(newWeight) > 0) {
+      const weekNumber = weightHistory.length + 1;
+      setWeightHistory([
+        ...weightHistory,
+        { date: `Semana ${weekNumber}`, weight: parseFloat(newWeight) }
+      ]);
+      setNewWeight('');
+      setShowAddWeight(false);
+    }
+  };
 
   return (
     <div className="p-4 space-y-6">
@@ -109,7 +48,7 @@ export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
       <div className="pt-4">
         <h1 className="text-3xl font-bold mb-2">Meu Perfil</h1>
         <p className="text-muted-foreground">
-          Gerencie suas informações e configurações
+          Acompanhe sua evolução e progresso
         </p>
       </div>
 
@@ -126,6 +65,128 @@ export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
         </div>
       </div>
 
+      {/* Progress Overview */}
+      <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl p-6 text-white shadow-xl">
+        <div className="flex items-center gap-2 mb-3">
+          <Award className="w-6 h-6" />
+          <h3 className="text-xl font-bold">Seu Progresso</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p className="text-white/80 text-sm mb-1">Peso Perdido</p>
+            <p className="text-3xl font-bold">{weightLost.toFixed(1)} kg</p>
+          </div>
+          <div>
+            <p className="text-white/80 text-sm mb-1">Falta Perder</p>
+            <p className="text-3xl font-bold">{(weightToGo - weightLost).toFixed(1)} kg</p>
+          </div>
+        </div>
+        <div className="bg-white/20 rounded-full h-3 overflow-hidden backdrop-blur-sm">
+          <div 
+            className="bg-white h-full rounded-full transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        <p className="text-white/90 text-sm mt-2 text-center">{progressPercentage}% da meta alcançada</p>
+      </div>
+
+      {/* Weight Evolution Chart */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <TrendingDown className="w-5 h-5 text-purple-600" />
+            <h3 className="font-bold text-lg">Evolução de Peso</h3>
+          </div>
+          <button
+            onClick={() => setShowAddWeight(!showAddWeight)}
+            className="flex items-center gap-1 px-3 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-lg hover:scale-105 transition-transform text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar
+          </button>
+        </div>
+
+        {/* Add Weight Form */}
+        {showAddWeight && (
+          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+            <label className="block text-sm font-medium mb-2">Novo Peso (kg)</label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                step="0.1"
+                value={newWeight}
+                onChange={(e) => setNewWeight(e.target.value)}
+                placeholder="Ex: 75.5"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <button
+                onClick={handleAddWeight}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg font-medium hover:scale-105 transition-transform"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Weight History Graph */}
+        <div className="space-y-3">
+          {weightHistory.map((entry, index) => {
+            const isLatest = index === weightHistory.length - 1;
+            const previousWeight = index > 0 ? weightHistory[index - 1].weight : quizData.currentWeight;
+            const difference = previousWeight - entry.weight;
+            
+            return (
+              <div key={index} className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-20">
+                  <p className="text-xs text-muted-foreground">{entry.date}</p>
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-200 dark:bg-gray-800 rounded-full h-8 overflow-hidden relative">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        isLatest 
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-600' 
+                          : 'bg-gradient-to-r from-blue-400 to-blue-500'
+                      }`}
+                      style={{ width: `${((quizData.currentWeight - entry.weight + quizData.targetWeight) / quizData.currentWeight) * 100}%` }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-between px-3">
+                      <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                        {entry.weight.toFixed(1)} kg
+                      </span>
+                      {difference > 0 && (
+                        <span className="text-xs font-bold text-green-600">
+                          -{difference.toFixed(1)} kg
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Summary Stats */}
+        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Peso Inicial</p>
+              <p className="font-bold text-lg">{quizData.currentWeight} kg</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Peso Atual</p>
+              <p className="font-bold text-lg text-purple-600">{weightHistory[weightHistory.length - 1].weight.toFixed(1)} kg</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Meta</p>
+              <p className="font-bold text-lg text-green-600">{quizData.targetWeight} kg</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-800">
@@ -133,7 +194,7 @@ export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
             <Scale className="w-5 h-5" />
             <span className="text-sm font-medium">Peso Atual</span>
           </div>
-          <p className="text-2xl font-bold">{quizData.currentWeight} kg</p>
+          <p className="text-2xl font-bold">{weightHistory[weightHistory.length - 1].weight.toFixed(1)} kg</p>
         </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-800">
@@ -175,25 +236,6 @@ export function ProfileTab({ quizData, onResetQuiz }: ProfileTabProps) {
           ))}
         </div>
       </div>
-
-      {/* Premium Banner */}
-      <button
-        onClick={() => setShowPremium(true)}
-        className="w-full bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-xl hover:scale-105 transition-transform"
-      >
-        <div className="flex items-center justify-between">
-          <div className="text-left">
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-6 h-6" />
-              <span className="font-bold text-lg">Upgrade para Premium</span>
-            </div>
-            <p className="text-sm text-white/90">
-              Desbloqueie mais de 100 treinos e 50 receitas
-            </p>
-          </div>
-          <ChevronRight className="w-6 h-6" />
-        </div>
-      </button>
 
       {/* Settings */}
       <div className="space-y-3">

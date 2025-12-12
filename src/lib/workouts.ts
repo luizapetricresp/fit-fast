@@ -1,273 +1,428 @@
-export interface QuizData {
-  currentWeight: number;
-  targetWeight: number;
-  height: number;
-  muscleGroups: string[];
-  fitnessLevel: 'iniciante' | 'intermediário' | 'avançado';
-  medication?: {
-    takesMedication: boolean;
-    medicationName?: string;
-    category?: 'fitoterápico' | 'suplemento' | 'prescrição';
-    dosesPerDay?: number;
-    times?: string[];
-  };
-}
-
 export interface Exercise {
+  id: string;
   name: string;
-  reps: string;
-  duration: number; // in seconds
-  rest: number; // in seconds
-  instructions: string[];
+  duration: number; // segundos
+  rest: number; // segundos de descanso
+  reps?: string;
+  calories: number;
   image: string;
+  instructions: string[];
+  muscleGroups: string[];
 }
 
 export interface WorkoutDay {
   day: number;
   title: string;
   difficulty: 'iniciante' | 'intermediário' | 'avançado';
-  totalTime: number; // in minutes
-  totalCalories: number;
   exercises: Exercise[];
+  totalTime: number;
+  totalCalories: number;
+  focus: string[];
 }
 
-export function generateWorkoutPlan(quizData: QuizData): WorkoutDay[] {
-  const plan: WorkoutDay[] = [];
-  const totalDays = 90; // 90 days plan
+export interface QuizData {
+  currentWeight: number;
+  targetWeight: number;
+  height: number;
+  muscleGroups: string[];
+  fitnessLevel: 'iniciante' | 'intermediário' | 'avançado';
+}
 
-  // Base difficulty from fitness level
-  let baseDifficulty: 'iniciante' | 'intermediário' | 'avançado' = quizData.fitnessLevel;
-
-  // Adjust difficulty based on medication
-  if (quizData.medication?.takesMedication) {
-    if (quizData.medication.category === 'prescrição') {
-      // Prescription meds might require easier workouts initially
-      baseDifficulty = 'iniciante';
-    }
+export const exercises: Exercise[] = [
+  {
+    id: 'jumping-jacks',
+    name: 'Polichinelos',
+    duration: 30,
+    rest: 10,
+    reps: '30 segundos',
+    calories: 8,
+    image: '🏃',
+    muscleGroups: ['pernas', 'abdomen'],
+    instructions: [
+      'Fique em pé com os pés juntos',
+      'Pule abrindo pernas e braços simultaneamente',
+      'Retorne à posição inicial',
+      'Mantenha ritmo constante'
+    ]
+  },
+  {
+    id: 'push-ups',
+    name: 'Flexões',
+    duration: 40,
+    rest: 15,
+    reps: 'x10',
+    calories: 12,
+    image: '💪',
+    muscleGroups: ['bracos', 'peito'],
+    instructions: [
+      'Posição de prancha com mãos na largura dos ombros',
+      'Desça o corpo mantendo as costas retas',
+      'Empurre de volta à posição inicial',
+      'Mantenha o core contraído'
+    ]
+  },
+  {
+    id: 'squats',
+    name: 'Agachamentos',
+    duration: 40,
+    rest: 15,
+    reps: 'x15',
+    calories: 15,
+    image: '🦵',
+    muscleGroups: ['pernas', 'gluteos'],
+    instructions: [
+      'Fique em pé com pés na largura dos ombros',
+      'Desça como se fosse sentar em uma cadeira',
+      'Mantenha joelhos alinhados com os pés',
+      'Retorne à posição inicial'
+    ]
+  },
+  {
+    id: 'plank',
+    name: 'Prancha',
+    duration: 30,
+    rest: 10,
+    reps: '30 segundos',
+    calories: 10,
+    image: '🧘',
+    muscleGroups: ['abdomen', 'costas'],
+    instructions: [
+      'Apoie antebraços e pontas dos pés no chão',
+      'Mantenha corpo reto da cabeça aos pés',
+      'Contraia abdômen e glúteos',
+      'Respire normalmente'
+    ]
+  },
+  {
+    id: 'lunges',
+    name: 'Afundos',
+    duration: 40,
+    rest: 15,
+    reps: 'x10 cada perna',
+    calories: 14,
+    image: '🦿',
+    muscleGroups: ['pernas', 'gluteos'],
+    instructions: [
+      'Dê um passo à frente',
+      'Desça até joelho traseiro quase tocar o chão',
+      'Empurre com perna da frente para voltar',
+      'Alterne as pernas'
+    ]
+  },
+  {
+    id: 'mountain-climbers',
+    name: 'Escaladores',
+    duration: 30,
+    rest: 10,
+    reps: '30 segundos',
+    calories: 12,
+    image: '⛰️',
+    muscleGroups: ['abdomen', 'pernas'],
+    instructions: [
+      'Posição de prancha alta',
+      'Traga joelho direito em direção ao peito',
+      'Retorne e repita com joelho esquerdo',
+      'Mantenha ritmo rápido'
+    ]
+  },
+  {
+    id: 'crunches',
+    name: 'Abdominais',
+    duration: 40,
+    rest: 15,
+    reps: 'x20',
+    calories: 10,
+    image: '💥',
+    muscleGroups: ['abdomen'],
+    instructions: [
+      'Deite de costas com joelhos dobrados',
+      'Mãos atrás da cabeça',
+      'Levante ombros do chão contraindo abdômen',
+      'Desça controladamente'
+    ]
+  },
+  {
+    id: 'burpees',
+    name: 'Burpees',
+    duration: 40,
+    rest: 20,
+    reps: 'x8',
+    calories: 18,
+    image: '🔥',
+    muscleGroups: ['pernas', 'bracos', 'abdomen'],
+    instructions: [
+      'Comece em pé',
+      'Agache e apoie mãos no chão',
+      'Jogue pernas para trás (prancha)',
+      'Retorne e pule para cima'
+    ]
+  },
+  {
+    id: 'leg-raises',
+    name: 'Elevação de Pernas',
+    duration: 30,
+    rest: 15,
+    reps: 'x12',
+    calories: 11,
+    image: '🦵',
+    muscleGroups: ['abdomen', 'pernas'],
+    instructions: [
+      'Deite de costas com pernas estendidas',
+      'Levante pernas até 90 graus',
+      'Desça controladamente sem tocar o chão',
+      'Mantenha lombar no chão'
+    ]
+  },
+  {
+    id: 'tricep-dips',
+    name: 'Mergulhos de Tríceps',
+    duration: 30,
+    rest: 15,
+    reps: 'x12',
+    calories: 10,
+    image: '💪',
+    muscleGroups: ['bracos'],
+    instructions: [
+      'Use uma cadeira ou banco',
+      'Mãos na borda, pernas estendidas',
+      'Desça dobrando cotovelos',
+      'Empurre de volta'
+    ]
+  },
+  {
+    id: 'high-knees',
+    name: 'Joelhos Altos',
+    duration: 30,
+    rest: 10,
+    reps: '30 segundos',
+    calories: 10,
+    image: '🏃‍♂️',
+    muscleGroups: ['pernas', 'abdomen'],
+    instructions: [
+      'Corra no lugar elevando joelhos',
+      'Traga joelhos até altura do quadril',
+      'Mantenha ritmo rápido',
+      'Balance braços naturalmente'
+    ]
+  },
+  {
+    id: 'bicycle-crunches',
+    name: 'Abdominal Bicicleta',
+    duration: 40,
+    rest: 15,
+    reps: 'x20',
+    calories: 12,
+    image: '🚴',
+    muscleGroups: ['abdomen'],
+    instructions: [
+      'Deite de costas, mãos atrás da cabeça',
+      'Traga cotovelo direito ao joelho esquerdo',
+      'Alterne os lados em movimento de pedalada',
+      'Mantenha abdômen contraído'
+    ]
+  },
+  {
+    id: 'glute-bridges',
+    name: 'Ponte de Glúteos',
+    duration: 40,
+    rest: 15,
+    reps: 'x15',
+    calories: 11,
+    image: '🍑',
+    muscleGroups: ['gluteos', 'pernas'],
+    instructions: [
+      'Deite de costas, joelhos dobrados',
+      'Eleve quadril contraindo glúteos',
+      'Mantenha ombros no chão',
+      'Desça controladamente'
+    ]
+  },
+  {
+    id: 'side-plank',
+    name: 'Prancha Lateral',
+    duration: 30,
+    rest: 15,
+    reps: '30s cada lado',
+    calories: 9,
+    image: '🧘‍♀️',
+    muscleGroups: ['abdomen', 'costas'],
+    instructions: [
+      'Apoie antebraço e lateral do pé',
+      'Mantenha corpo reto',
+      'Contraia abdômen lateral',
+      'Alterne os lados'
+    ]
+  },
+  {
+    id: 'superman',
+    name: 'Superman',
+    duration: 30,
+    rest: 15,
+    reps: 'x12',
+    calories: 8,
+    image: '🦸',
+    muscleGroups: ['costas', 'gluteos'],
+    instructions: [
+      'Deite de bruços, braços estendidos',
+      'Levante braços e pernas simultaneamente',
+      'Mantenha por 2 segundos',
+      'Desça controladamente'
+    ]
+  },
+  {
+    id: 'wall-sit',
+    name: 'Agachamento na Parede',
+    duration: 40,
+    rest: 15,
+    reps: '40 segundos',
+    calories: 10,
+    image: '🧱',
+    muscleGroups: ['pernas', 'gluteos'],
+    instructions: [
+      'Encoste costas na parede',
+      'Desça até joelhos em 90 graus',
+      'Mantenha a posição',
+      'Respire normalmente'
+    ]
   }
+];
 
-  const muscleGroups = quizData.muscleGroups.length > 0 ? quizData.muscleGroups : ['abdomen', 'pernas', 'bracos'];
-
-  for (let day = 1; day <= totalDays; day++) {
-    // Cycle through muscle groups
-    const focusGroup = muscleGroups[day % muscleGroups.length];
-
-    // Progress difficulty over time
-    let difficulty = baseDifficulty;
-    if (day > 30 && baseDifficulty === 'iniciante') {
+export const generatePersonalizedWorkout = (quizData: QuizData): WorkoutDay[] => {
+  const { currentWeight, targetWeight, muscleGroups, fitnessLevel } = quizData;
+  
+  // Calcula quantos kg precisa perder
+  const weightToLose = currentWeight - targetWeight;
+  
+  // Define duração do plano baseado no peso a perder (1kg por semana é saudável)
+  const weeksNeeded = Math.ceil(weightToLose / 0.5); // 0.5kg por semana é mais realista
+  const daysNeeded = Math.min(weeksNeeded * 7, 90); // Máximo 90 dias
+  
+  // Filtra exercícios baseado nos grupos musculares selecionados
+  const relevantExercises = exercises.filter(ex => 
+    ex.muscleGroups.some(group => muscleGroups.includes(group))
+  );
+  
+  // Adiciona exercícios de cardio para emagrecimento (sempre incluir)
+  const cardioExercises = exercises.filter(ex => 
+    ['jumping-jacks', 'burpees', 'mountain-climbers', 'high-knees'].includes(ex.id)
+  );
+  
+  const plan: WorkoutDay[] = [];
+  
+  // Define número de exercícios por nível
+  const exerciseCountByLevel = {
+    'iniciante': 6,
+    'intermediário': 8,
+    'avançado': 10
+  };
+  
+  const baseExerciseCount = exerciseCountByLevel[fitnessLevel];
+  
+  for (let day = 1; day <= daysNeeded; day++) {
+    // Progressão gradual: aumenta exercícios a cada 10 dias
+    const progressionBonus = Math.floor(day / 10);
+    const exerciseCount = baseExerciseCount + progressionBonus;
+    
+    // Garante pelo menos 2 exercícios de cardio por treino (emagrecimento)
+    const cardioCount = Math.min(3, Math.floor(exerciseCount * 0.4));
+    const muscleCount = exerciseCount - cardioCount;
+    
+    // Seleciona exercícios
+    const selectedCardio = cardioExercises
+      .sort(() => Math.random() - 0.5)
+      .slice(0, cardioCount);
+    
+    const selectedMuscle = relevantExercises
+      .filter(ex => !cardioExercises.includes(ex))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, muscleCount);
+    
+    const dayExercises = [...selectedCardio, ...selectedMuscle]
+      .sort(() => Math.random() - 0.5);
+    
+    // Ajusta intensidade baseado no nível
+    const intensityMultiplier = {
+      'iniciante': 1,
+      'intermediário': 1.2,
+      'avançado': 1.5
+    }[fitnessLevel];
+    
+    const adjustedExercises = dayExercises.map(ex => ({
+      ...ex,
+      duration: Math.round(ex.duration * intensityMultiplier),
+      calories: Math.round(ex.calories * intensityMultiplier)
+    }));
+    
+    const totalTime = adjustedExercises.reduce((acc, ex) => acc + ex.duration + ex.rest, 0);
+    const totalCalories = adjustedExercises.reduce((acc, ex) => acc + ex.calories, 0);
+    
+    // Define dificuldade baseada no progresso
+    let difficulty: 'iniciante' | 'intermediário' | 'avançado';
+    if (day <= Math.floor(daysNeeded * 0.3)) {
+      difficulty = 'iniciante';
+    } else if (day <= Math.floor(daysNeeded * 0.7)) {
       difficulty = 'intermediário';
-    } else if (day > 60 && baseDifficulty !== 'avançado') {
+    } else {
       difficulty = 'avançado';
     }
-
-    // Generate workout title based on focus
-    const titles = {
-      abdomen: ['Abdominal Definido', 'Core Forte', 'Barriga Chapada', 'Abdominais Avançados'],
-      pernas: ['Pernas Poderosas', 'Glúteos Firmes', 'Quadríceps Explosivos', 'Pernas de Aço'],
-      bracos: ['Braços Definidos', 'Bíceps e Tríceps', 'Braços Fortes', 'Músculos Superiores'],
-      gluteos: ['Glúteos Perfeitos', 'Bumbum Fitness', 'Glúteos Elevados', 'Pós-erior Forte'],
-      peito: ['Peito Esportivo', 'Peitoral Definido', 'Peito Forte', 'Superior Frontal'],
-      costas: ['Costas Poderosas', 'Dorsal Forte', 'Costas Definidas', 'Posterior Superior']
-    };
-
-    const groupTitles = titles[focusGroup as keyof typeof titles] || ['Treino Completo'];
-    const title = groupTitles[day % groupTitles.length];
-
-    // Generate exercises based on focus group and difficulty
-    const exercises = generateExercises(focusGroup, difficulty);
-
-    // Calculate time and calories based on difficulty
-    const timeMultipliers = { iniciante: 30, intermediário: 45, avançado: 60 };
-    const calorieMultipliers = { iniciante: 200, intermediário: 300, avançado: 400 };
-
-    const totalTime = timeMultipliers[difficulty];
-    const totalCalories = calorieMultipliers[difficulty];
-
+    
     plan.push({
       day,
-      title,
+      title: `Dia ${day} - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
       difficulty,
+      exercises: adjustedExercises,
       totalTime,
       totalCalories,
-      exercises
+      focus: muscleGroups.map(g => {
+        const labels: Record<string, string> = {
+          'abdomen': 'Abdômen',
+          'pernas': 'Pernas',
+          'bracos': 'Braços',
+          'gluteos': 'Glúteos',
+          'peito': 'Peito',
+          'costas': 'Costas'
+        };
+        return labels[g];
+      })
     });
   }
-
+  
   return plan;
-}
+};
 
-function generateExercises(focusGroup: string, difficulty: 'iniciante' | 'intermediário' | 'avançado'): Exercise[] {
-  const exerciseDatabase = {
-    abdomen: [
-      {
-        name: 'Abdominal Crunch',
-        reps: '3x15',
-        duration: 30,
-        rest: 20,
-        instructions: ['Deite de costas no chão', 'Dobre os joelhos', 'Levante o tronco em direção aos joelhos', 'Volte lentamente'],
-        image: '💪'
-      },
-      {
-        name: 'Prancha',
-        reps: '3x30s',
-        duration: 30,
-        rest: 20,
-        instructions: ['Deite de bruços', 'Apoie nos antebraços e pontas dos pés', 'Mantenha o corpo reto', 'Segure a posição'],
-        image: '🏋️'
-      },
-      {
-        name: 'Elevação de Pernas',
-        reps: '3x12',
-        duration: 25,
-        rest: 15,
-        instructions: ['Deite de costas', 'Mantenha as pernas estendidas', 'Levante as pernas até 90 graus', 'Desça lentamente'],
-        image: '🦵'
-      }
-    ],
-    pernas: [
-      {
-        name: 'Agachamento',
-        reps: '3x12',
-        duration: 40,
-        rest: 30,
-        instructions: ['Fique em pé com pés na largura dos ombros', 'Desça como se fosse sentar', 'Volte à posição inicial', 'Mantenha as costas retas'],
-        image: '🦵'
-      },
-      {
-        name: 'Afundo',
-        reps: '3x10 cada perna',
-        duration: 35,
-        rest: 25,
-        instructions: ['Dê um passo à frente', 'Desça até o joelho quase tocar o chão', 'Volte à posição inicial', 'Alterne as pernas'],
-        image: '🏃'
-      },
-      {
-        name: 'Panturrilha em Pé',
-        reps: '3x15',
-        duration: 30,
-        rest: 20,
-        instructions: ['Fique em pé', 'Levante os calcanhares', 'Desça lentamente', 'Mantenha o equilíbrio'],
-        image: '🦵'
-      }
-    ],
-    bracos: [
-      {
-        name: 'Flexão de Braço',
-        reps: '3x10',
-        duration: 35,
-        rest: 25,
-        instructions: ['Deite de bruços', 'Apoie as mãos no chão', 'Levante o corpo', 'Desça controladamente'],
-        image: '💪'
-      },
-      {
-        name: 'Tríceps na Parede',
-        reps: '3x12',
-        duration: 30,
-        rest: 20,
-        instructions: ['Vire de costas para a parede', 'Apoie as mãos na parede', 'Dobre os cotovelos', 'Volte à posição inicial'],
-        image: '💪'
-      },
-      {
-        name: 'Braços em Círculo',
-        reps: '3x15 cada direção',
-        duration: 25,
-        rest: 15,
-        instructions: ['Estenda os braços lateralmente', 'Faça círculos pequenos', 'Mantenha os braços retos', 'Alterne direções'],
-        image: '💪'
-      }
-    ],
-    gluteos: [
-      {
-        name: 'Ponte',
-        reps: '3x15',
-        duration: 35,
-        rest: 25,
-        instructions: ['Deite de costas', 'Dobre os joelhos', 'Levante os quadris', 'Contraia os glúteos'],
-        image: '🍑'
-      },
-      {
-        name: 'Agachamento Sumô',
-        reps: '3x12',
-        duration: 40,
-        rest: 30,
-        instructions: ['Abra os pés além da largura dos ombros', 'Desça como se fosse sentar', 'Volte à posição inicial', 'Mantenha os joelhos alinhados'],
-        image: '🦵'
-      },
-      {
-        name: 'Chute de Glúteo',
-        reps: '3x10 cada perna',
-        duration: 30,
-        rest: 20,
-        instructions: ['Fique em quatro apoios', 'Levante uma perna para trás', 'Contraia o glúteo', 'Volte lentamente'],
-        image: '🍑'
-      }
-    ],
-    peito: [
-      {
-        name: 'Flexão de Braço',
-        reps: '3x10',
-        duration: 35,
-        rest: 25,
-        instructions: ['Deite de bruços', 'Apoie as mãos no chão', 'Levante o corpo', 'Desça controladamente'],
-        image: '💪'
-      },
-      {
-        name: 'Abertura de Braços',
-        reps: '3x12',
-        duration: 30,
-        rest: 20,
-        instructions: ['Fique em pé', 'Estenda os braços lateralmente', 'Traga os braços à frente', 'Como se abraçasse alguém'],
-        image: '💪'
-      },
-      {
-        name: 'Parede Push',
-        reps: '3x15',
-        duration: 25,
-        rest: 15,
-        instructions: ['Fique em frente à parede', 'Apoie as mãos na parede', 'Empurre a parede', 'Volte lentamente'],
-        image: '🏗️'
-      }
-    ],
-    costas: [
-      {
-        name: 'Remada Alta',
-        reps: '3x12',
-        duration: 35,
-        rest: 25,
-        instructions: ['Fique em pé', 'Puxe os cotovelos para trás', 'Como se remasse', 'Mantenha as costas retas'],
-        image: '🏋️'
-      },
-      {
-        name: 'Prancha Invertida',
-        reps: '3x20s',
-        duration: 20,
-        rest: 15,
-        instructions: ['Deite de costas', 'Apoie nos calcanhares e mãos', 'Levante os quadris', 'Mantenha o corpo reto'],
-        image: '🏋️'
-      },
-      {
-        name: 'Superman',
-        reps: '3x10',
-        duration: 30,
-        rest: 20,
-        instructions: ['Deite de bruços', 'Estenda os braços à frente', 'Levante braços e pernas', 'Mantenha por 2 segundos'],
-        image: '🦸'
-      }
-    ]
-  };
-
-  const groupExercises = exerciseDatabase[focusGroup as keyof typeof exerciseDatabase] || exerciseDatabase.abdomen;
-
-  // Adjust reps based on difficulty
-  const adjustedExercises = groupExercises.map(exercise => {
-    let adjustedReps = exercise.reps;
-    if (difficulty === 'iniciante') {
-      adjustedReps = exercise.reps.replace(/(\d+)/g, (match) => Math.floor(parseInt(match) * 0.7).toString());
-    } else if (difficulty === 'avançado') {
-      adjustedReps = exercise.reps.replace(/(\d+)/g, (match) => Math.floor(parseInt(match) * 1.3).toString());
-    }
-    return { ...exercise, reps: adjustedReps };
-  });
-
-  return adjustedExercises;
-}
+export const generateWorkoutPlan = (quizData: QuizData): WorkoutDay[] => {
+  // Se tiver quizData, usa o plano personalizado
+  if (quizData) {
+    return generatePersonalizedWorkout(quizData);
+  }
+  
+  // Caso contrário, gera um plano padrão de 30 dias
+  const plan: WorkoutDay[] = [];
+  
+  for (let day = 1; day <= 30; day++) {
+    const difficulty = day <= 10 ? 'iniciante' : day <= 20 ? 'intermediário' : 'avançado';
+    const exerciseCount = day <= 10 ? 5 : day <= 20 ? 7 : 9;
+    
+    // Seleciona exercícios variados
+    const dayExercises = exercises
+      .sort(() => Math.random() - 0.5)
+      .slice(0, exerciseCount);
+    
+    const totalTime = dayExercises.reduce((acc, ex) => acc + ex.duration + ex.rest, 0);
+    const totalCalories = dayExercises.reduce((acc, ex) => acc + ex.calories, 0);
+    
+    const focuses = ['Corpo Inteiro', 'Cardio', 'Força'];
+    
+    plan.push({
+      day,
+      title: `Dia ${day} - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
+      difficulty,
+      exercises: dayExercises,
+      totalTime,
+      totalCalories,
+      focus: [focuses[day % 3]]
+    });
+  }
+  
+  return plan;
+};
